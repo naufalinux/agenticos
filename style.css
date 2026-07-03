@@ -261,6 +261,13 @@ button {
   background-color: var(--hover-color);
   border-color: var(--border-color);
 }
+.settings-btn.power-btn {
+  color: var(--status-executing);
+}
+.settings-btn.power-btn:hover {
+  background-color: rgba(218, 54, 51, 0.1);
+  border-color: var(--status-executing);
+}
 .settings-btn svg {
   width: 16px;
   height: 16px;

@@ -1,3 +1,5 @@
+import { getCurrentWindow } from '@tauri-apps/api/window';
+
 // DOM Elements
 const html = document.documentElement;
 const themeToggle = document.getElementById('theme-toggle');
@@ -8,8 +10,15 @@ const statusText = document.getElementById('status-text');
 const modalOverlay = document.getElementById('modal-overlay');
 const registrationModal = document.getElementById('registration-modal');
 const loginModal = document.getElementById('login-modal');
-const regForm = document.getElementById('registration-form');
+const regStep1 = document.getElementById('reg-step-1');
+const regStep2 = document.getElementById('reg-step-2');
+const regStep3 = document.getElementById('reg-step-3');
+const regSubtitle = document.getElementById('reg-subtitle');
 const loginForm = document.getElementById('login-form');
+const powerBtn = document.getElementById('power-btn');
+const powerOffModal = document.getElementById('power-off-modal');
+const powerOffForm = document.getElementById('power-off-form');
+const powerOffCancel = document.getElementById('power-off-cancel');
 
 // Chat & Inputs
 const chatContainer = document.getElementById('chat-container');
@@ -89,12 +98,43 @@ themeToggle.addEventListener('click', () => {
 });
 
 // Registration Logic
-regForm.addEventListener('submit', async (e) => {
+let tempRegData = {};
+
+regStep1.addEventListener('submit', async (e) => {
   e.preventDefault();
   const pwd = document.getElementById('reg-password').value;
+  const confirm = document.getElementById('reg-password-confirm').value;
   const email = document.getElementById('reg-email').value;
   
-  await mockRestApiCall('/api/v1/register', { email, pwdLength: pwd.length });
+  if (pwd !== confirm) {
+    alert("Passphrases do not match.");
+    return;
+  }
+  
+  tempRegData = { email, pwdLength: pwd.length };
+  await mockRestApiCall('/api/v1/register/step1', tempRegData);
+  
+  regStep1.classList.add('hidden');
+  regStep2.classList.remove('hidden');
+  regSubtitle.innerText = "Set up your Authenticator App.";
+});
+
+regStep2.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const totp = document.getElementById('reg-totp').value;
+  
+  await mockRestApiCall('/api/v1/register/totp', { totp });
+  
+  regStep2.classList.add('hidden');
+  regStep3.classList.remove('hidden');
+  regSubtitle.innerText = `Enter the OTP sent to ${tempRegData.email}`;
+});
+
+regStep3.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const otp = document.getElementById('reg-otp').value;
+  
+  await mockRestApiCall('/api/v1/register/complete', { otp });
   
   localStorage.setItem('agenticos_registered', 'true');
   isRegistered = true;
@@ -108,10 +148,48 @@ loginForm.addEventListener('submit', async (e) => {
   await mockRestApiCall('/api/v1/login', { timestamp: Date.now() });
   
   modalOverlay.classList.add('hidden');
+  loginModal.classList.add('hidden');
   updateStatus('STAND_BY', 'stand-by');
   // Auto-focus input when entering chat
   setTimeout(() => userInput.focus(), 500);
 });
+
+// Power Off Logic
+if (powerBtn) {
+  powerBtn.addEventListener('click', () => {
+    modalOverlay.classList.remove('hidden');
+    powerOffModal.classList.remove('hidden');
+    document.getElementById('power-off-password').value = '';
+    setTimeout(() => document.getElementById('power-off-password').focus(), 100);
+  });
+}
+
+if (powerOffCancel) {
+  powerOffCancel.addEventListener('click', () => {
+    // Only hide if we aren't also locked
+    if (currentState === 'STAND_BY' || currentState === 'LOCKED') {
+      powerOffModal.classList.add('hidden');
+      modalOverlay.classList.add('hidden');
+    }
+  });
+}
+
+if (powerOffForm) {
+  powerOffForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await mockRestApiCall('/api/v1/shutdown', {});
+    
+    try {
+      await getCurrentWindow().close();
+    } catch (err) {
+      window.close();
+      // Fallback if browser prevents closing script
+      updateStatus('LOCKED', 'LOCKED');
+      powerOffModal.classList.add('hidden');
+      loginModal.classList.remove('hidden');
+    }
+  });
+}
 
 // Suggestion Chips
 suggestionChips.forEach(chip => {
