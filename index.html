@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgenticOS</title>
+    <!-- Use Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- App Container -->
+    <div id="app" class="app-container">
+      
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">
+            <span class="logo-icon">✧</span>
+            <h2>AgenticOS</h2>
+          </div>
+          <button class="menu-toggle" id="menu-toggle" title="Toggle Sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+        </div>
+
+        <div class="sidebar-content">
+          <button class="new-chat-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            New Task
+          </button>
+          
+          <div class="history-list">
+            <div class="history-label">Recent Tasks</div>
+            <a href="#" class="history-item active">Extract Inpatient Metrics</a>
+            <a href="#" class="history-item">Update DB Ledger</a>
+            <a href="#" class="history-item">System Log Analysis</a>
+          </div>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="status-indicator">
+            <span class="status-dot stand-by" id="status-dot"></span>
+            <span class="status-text" id="status-text">STAND_BY</span>
+          </div>
+          <button class="settings-btn" id="theme-toggle" title="Toggle Theme">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Chat Area -->
+        <div class="chat-container" id="chat-container">
+          <div class="greeting-screen" id="greeting-screen">
+            <h1>Hello, Admin.</h1>
+            <p>How can I assist you with system operations today?</p>
+            <div class="suggestion-chips">
+              <button class="chip">Extract the last 5 days of metrics</button>
+              <button class="chip">Update the offline financial ledger</button>
+              <button class="chip">Analyze recent security logs</button>
+            </div>
+          </div>
+          
+          <div class="messages-list" id="messages-list">
+            <!-- Messages will be injected here -->
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+          <!-- Approval Gate UI (Hidden by Default) -->
+          <div class="approval-gate hidden" id="approval-gate">
+            <div class="gate-header">
+              <span class="gate-title">Authorization Required</span>
+              <span class="gate-subtitle">Review planned actions before execution.</span>
+            </div>
+            <div class="gate-actions">
+              <button class="gate-btn deny" id="btn-deny">Deny</button>
+              <button class="gate-btn approve" id="btn-approve">Approve</button>
+              <button class="gate-btn always" id="btn-always">Always Approve</button>
+            </div>
+          </div>
+
+          <form class="input-form" id="input-form">
+            <div class="input-wrapper">
+              <input type="text" id="user-input" placeholder="Enter system command or task..." autocomplete="off" />
+              <button type="submit" class="send-btn" id="send-btn" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+            </div>
+          </form>
+          <div class="footer-disclaimer">
+            AgenticOS runs locally and has elevated system privileges. Use with caution.
+          </div>
+        </div>
+      </main>
+
+      <!-- Registration / Login Modals Overlay -->
+      <div class="modal-overlay" id="modal-overlay">
+        <!-- Registration Modal -->
+        <div class="modal registration-modal hidden" id="registration-modal">
+          <h2>First-Time Registration</h2>
+          <p>Please initialize your administrative account for AgenticOS.</p>
+          <form id="registration-form" class="modal-form">
+            <div class="form-group">
+              <label>OS User Binding</label>
+              <input type="text" value="%USERNAME%" disabled />
+            </div>
+            <div class="form-group">
+              <label>Administrative Passphrase</label>
+              <input type="password" id="reg-password" required />
+            </div>
+            <div class="form-group">
+              <label>Corporate Google Mail</label>
+              <input type="email" id="reg-email" required />
+            </div>
+            <button type="submit" class="primary-btn">Complete Registration</button>
+          </form>
+        </div>
+
+        <!-- Login Modal -->
+        <div class="modal login-modal" id="login-modal">
+          <div class="modal-icon">✧</div>
+          <h2>AgenticOS Authentication</h2>
+          <p>Enter your passphrase to unlock system operations.</p>
+          <form id="login-form" class="modal-form">
+            <div class="form-group">
+              <input type="password" id="login-password" placeholder="Passphrase" required autofocus />
+            </div>
+            <button type="submit" class="primary-btn">Unlock Session</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
